@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+    <style>
+        input{ border:0; }
+    </style>
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">选&nbsp&nbsp课</a>
+	</div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('student.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+</header>
+{#<h3>选课：</h3>#}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>课程代码</th>
+                <th>课程名称</th>
+                <th>授课老师</th>
+            </tr>
+        </thead>
+        {% for course,teacher in dict.items() %}
+            <form action="{{url_for('student.choose_course') }}" method="post">
+                <tr>
+                    <td><input type="text" name="cid" value="{{ course.c_id }}" readonly="readonly"></td>
+                    <td><input type="text" name="cname" value="{{ course.c_name }}" readonly="readonly"></td>
+                    <td><input type="text" name="tname" value="{{ teacher.t_name }}" readonly="readonly"></td>
+                    <td><input type="submit" class="btn" value="选课"></td>
+                </tr>
+            </form>
+        {% endfor %}
+    </table>
+</body>
+</html>

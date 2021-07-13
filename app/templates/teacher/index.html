@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+    <title>刷脸签到系统</title>
+    <style>
+        .div-a{ float:left;width:50%;border:1px solid white;text-align: center}
+        .div-c{ float: left;width: 10%; border: 1px solid white}
+        .div-b{ float:left;width:30%;border:1px solid white}
+
+    </style>
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">课程考勤</a>
+	</div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('teacher.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+</header>
+    <div class="div-a">
+                <input type="image" src="{{ url_for('teacher.video_feed') }}" id="video" name="face">
+    </div>
+    <div class="div-c"></div>
+    <div class="div-b">
+        <table>
+            <h2>签到结果：</h2>
+            <br>
+            <br>
+            <h4 id="result"></h4>
+            <br>
+            <br>
+            <form action="{{ url_for('teacher.stop_records') }}" method="post"><input type="submit"  class="btn btn-primary" value="停止签到"></form>
+        </table>
+    </div>
+
+{#        <img src="{{ url_for('video_feed') }}">#}
+{#    <img src="{{ url_for('video_feed') }}">#}
+{#    <a href="{{ url_for('upload_faces') }}">录入照片</a>#}
+
+
+     <script>
+        $("#canvas").width($("#video").width());
+        $("#canvas").height($("#video").height());
+
+        function getPic(){
+            /*获取前端的视频标签和画布的标签*/
+            video=document.getElementById("video");
+            canvas=document.getElementById("canvas");
+            /*用canvas画图,画的是平面的2d图形*/
+            ctx=canvas.getContext("2d");
+            /*调用canvas画布当中的drawImage画图函数*/
+            /*drawImage四个参数:画图位置和宽高*/
+            /*画的目标是视频中的内容*/
+            ctx.drawImage(video,0,0,video.width,video.height);
+        }
+        window.onload = function () {
+        getApi();
+        };
+        function getApi() {
+            setTimeout(getApi,1000);
+            $.get("/teacher/now_attend", function (res) {
+                console.log(res);
+                var len = res.length - 1;
+                $("#result").text(res[len]);
+            });
+
+        }
+
+        function stop() {
+            $.get("/teacher/stop_records");
+
+        }
+    </script>
+</body>
+</html>

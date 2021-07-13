@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+    <style>
+        input{ border:0; }
+    </style>
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">学生信息</a>
+	</div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li><a data-toggle="modal" data-target="#add_sc" id="a">批量导入</a></li>
+        </ul>
+
+        <div class="modal fade" id="add_sc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            批量导入
+                        </h4>
+                    </div>
+                    <form action="{{ url_for('teacher.upload_student') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body" style="align-content: left">
+                            下载：<a href="../../static/Files/student.xlsx" download="学生账号导入模板.xlsx">学生账号导入模板</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            上传：<input type="file" style="display: inline" name="student_file" >
+                            <br>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                        <div class="form-group" >
+                                    {% for message in get_flashed_messages() %}
+                                        {% if message=='success' %}
+                                        <div class="flash alert alert-success" role="alert" id="dlktsxx">导入成功</div>
+                                        {% else %}
+                                       <div class="flash alert alert-danger" role="alert" id="dlktsxx">{{ message }}</div>
+                                        {% endif %}
+                                    {% endfor %}
+								</div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+    </div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('teacher.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+</header>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>学号</th>
+                <th>姓名</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for c,flag in dict.items() %}
+            <form action="{{url_for('teacher.select_all_student') }}" method="post">
+                <tr>
+                    <td><input type="text" name="id" value="{{ c.s_id }}" readonly="readonly"></td>
+                    <td><input type="text" name="name" value="{{ c.s_name }}" readonly="readonly"></td>
+                         <input type="text" value="{{ flag }}" name="flag" hidden>
+                    {% if flag %}
+
+                    <td><input type="button" value="删除" data-toggle="modal" data-target="#{{ c.s_id }}" ></td>
+                        <div class="modal fade" id="{{ c.s_id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            删除学生账号
+                        </h4>
+                    </div>
+                        <div class="modal-body" style="align-content: left">
+                            <div class="flash alert alert-danger" role="alert" id="dlktsxx1">该位学生还有关联的课程信息，将一并删除</div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="submit" class="btn btn-primary">确认</button>
+                        </div>
+
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+
+                    {% else %}
+                    <td><input type="submit" value="删除"></td>
+                    {% endif %}
+                </tr>
+            </form>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+<script>
+    var a = $("#dlktsxx").text();
+    if(a!=''){
+        document.getElementById('a').click()
+    }
+</script>
+</html>

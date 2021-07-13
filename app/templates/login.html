@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+
+<title>刷脸签到系统</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<link rel="stylesheet" type="text/css" href="../static/css/4.css" />
+<link rel="stylesheet" type="text/css" href="../static/css/5.css" />
+
+
+</head>
+<body style="background:#fafafa;">
+
+
+	<div class="container container_1170">
+		<div class="row sl_log_top">
+			<div class="col-sm-8 logo_1"><img src="../static/picture/1.png" style="margin-top:-3px" />
+				<span id="xtmc">刷脸签到系统</span>
+			</div>
+			<div class="col-sm-4 text-right hidden-xs">
+
+
+			</div>
+		</div>
+		<div class="row sl_log_bor4">
+
+			<div class="col-sm-8 hidden-xs sl_log_lf slideShow">
+				<!-- 0不轮换图片-->
+					<img class="img-responsive" src="../static/picture/loginimg.png" />
+			</div>
+			<div class="col-sm-4 sl_log_rt">
+					<form class="form-horizontal" role="form" action='{{ url_for('.login') }}' method="post">
+					<input type="hidden" id="csrftoken" name="csrftoken" value=""/>
+					<div>
+
+						<div class="tab-content">
+							<div id="home" class="tab-pane in active">
+
+									<h5>用户登录</h5>
+
+								<!-- 防止浏览器自动填充密码 -->
+								<input type="text" style="display: none;" autocomplete="off"/>
+								<input type="password" style="display: none;" autocomplete="off"/>
+								<!-- 防止浏览器自动填充密码 end -->
+
+
+									<p style="display: none;" id="tips" class="bg_danger sl_danger">
+									</p>
+
+								<div class="form-group">
+									<div class="input-group">
+										<div class="input-group-addon"><img src="../static/picture/user.png" width="16" height="16" /></div>
+										<input type="text" class="form-control" name="username" value="" placeholder="用户名" onblur="" autocomplete="off">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="input-group">
+										<div class="input-group-addon"><img src="../static/picture/pass.png" width="16" height="16" /></div>
+										<input type="password" name="mm" id="hidMm" style="display:none" >
+										<input type="text" class="form-control" name="password" id="mm" value="" placeholder="密码" autocomplete="new-password"  onfocus="this.type='password'">
+										<input type="password" style="display:none;">
+									</div>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="btn btn-primary btn-block" id="dl">登 录</button>
+								</div>
+{#                                <div class = "form-group">#}
+{#									<a href="" id="authJwglxtLoginURL" class="checkbox pull-right">点击注册</a>#}
+{#								</div>#}
+{#                                #}
+								<div class="form-group">
+                                    {% for message in get_flashed_messages() %}
+                                       <div class="flash alert alert-danger" role="alert" id="dlktsxx">{{ message }}</div>
+                                    {% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+<!-- footer -->
+<div id="footerID" class="footer">
+	<p></p>
+</div>
+
+</body>
+
+</html>

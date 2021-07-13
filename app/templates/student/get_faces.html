@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
+    <style>
+        video,canvas{
+            border:2px solid #2b8cdf;
+        }
+        .rr{
+            float: right;
+
+        }
+
+    </style>
+
+</head>
+<body>
+    <header class="col-xs-12 navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                人脸录入
+            </a>
+        </div>
+        <div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('student.home') }}">返回首页</a></li>
+            </ul>
+        </div>
+
+    </header>
+    <main div="col-xs-12">
+        <div align="center" class="alert-danger" id="message" role="alert" hidden> 提示</div>
+        <div class="col-xs-6">
+            <video id="video" width="640" height="480"></video>
+            <div class="col-xs-6">
+                <button onclick="openvideo()" class="btn btn-primary">打开摄像头</button>
+                <form action="{{ url_for('student.upload_faces') }}" method="post">
+                    <input type="submit" class="btn btn-primary" value="提交">
+                </form>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <div class="col-xs-6">
+                <button onclick="getPic()" class="btn btn-primary">拍照</button>
+                <button onclick="savePic()" class="btn btn-primary">确认</button>
+            </div>
+        </div>
+
+
+
+    </main>
+    <script>
+        $("#canvas").width($("#video").width())
+        $("#canvas").height($("#video").height())
+        function openvideo(){
+            /*获取前端的视频标签*/
+            video=document.getElementById("video")
+            /*定义一个video设备的字典,显示宽高*/
+            cons={
+                video:{width:video.width,height:video.height}
+            }
+            /*navigator导航的对象,它可以找到一些硬件mediaDevices,*/
+            /*getUserMedia取出video摄像头这个设备*/
+            pros=navigator.mediaDevices.getUserMedia(cons)
+            /*取出后做的内容,用then来接,把内容放在res参数中,与video进行关联*/
+            pros.then(function(res){
+                video.srcObject=res
+                video.play()
+            })
+
+        }
+        function upload() {
+            $.post("/student/upload_faces")
+        }
+
+        function getPic(){
+             /*获取前端的视频标签和画布的标签*/
+            video=document.getElementById("video")
+            canvas=document.getElementById("canvas")
+             /*用canvas画图,画的是平面的2d图形*/
+             ctx=canvas.getContext("2d")
+            /*调用canvas画布当中的drawImage画图函数*/
+            /*drawImage四个参数:画图位置和宽高*/
+            /*画的目标是视频中的内容*/
+             ctx.drawImage(video,0,0,640,480)
+        }
+        function savePic() {
+            /*获取前端画布的标签*/
+            canvas = document.getElementById("canvas")
+            data = canvas.toDataURL("image/jpg", 0.5)
+            console.log(data)
+            /*下面一句代码的意思,这个canvas转成的data数据前面的22位只是编码格式,不是图片数据*/
+            data = data.substring(22)
+            /*图片数据只能post方式来提交*/
+            $.post("/student/get_faces", {"face": data}, function (res) {
+                var data = res;
+                flag = data.result;
+                num = data.code;
+                if(flag == 'none') {
+                    msg = '未检测到人脸，请重新拍摄';
+                    $("#message").attr("class", 'alert-danger');
+                }
+                else if(flag == 'big') {
+                    msg = '人脸范围过大，请调整距离后再拍摄';
+                    $("#message").attr("class", 'alert-danger');
+                }
+                else if(flag == 'error'){
+                    msg = '提交不合格照片，请确保5张照片都合格后再提交';
+                    $("#message").attr("class", 'alert-danger');
+                }
+                else {
+                    if(num==5) {
+                        $("#message").attr("class", 'alert-warning');
+                        msg = '已成功拍摄5张照片，再次拍摄将覆盖最旧的照片，无误请点击提交';
+                    }
+                    else {
+                        msg = '照片合格，已保存，请继续拍摄至5张';
+                        $("#message").attr("class",'alert-success');
+                    }
+                }
+
+                $("#message").text(msg);
+                $("#message").show(msg);
+                $("#message").fadeOut(3000);
+
+
+
+            })
+        }
+
+        {#$(".flash").fadeOut(2000);#}
+    </script>
+
+</body>
+</html>

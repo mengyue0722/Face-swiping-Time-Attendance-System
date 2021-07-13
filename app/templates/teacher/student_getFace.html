@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">学生拍照权限管理</a>
+	</div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('teacher.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+</header>
+<main>
+<form action="{{ url_for('teacher.select_sc') }}" method="post">
+        课程名称：
+        {% if courses %}
+        <select class="dd" name="course_id">
+            <option></option>
+        {% for course in courses %}
+            <option value="{{ course.c_id }}">{{ course.c_name }}</option>
+        {% endfor %}
+        </select>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        学号：
+        <input type="text" class="dd" name="sid">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" class="btn btn-primary" value="查询">
+        {% endif %}
+    </form>
+<br>
+<br>
+
+<br><br>
+
+
+<div class="container-fluid">
+{% if dict %}
+    <div class="panel-group table" id="accordion">
+    {% for course,students in dict.items() %}
+        {# 一个课程#}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#{{ course.c_id }}">
+                        [{{ course.c_id }}] &nbsp&nbsp {{ course.c_name }}
+                    </a>
+                </h4>
+            </div>
+            <div id="{{ course.c_id }}" class="panel-collapse collapse collapse">
+                <div class="panel-body">
+                    {% if students %}
+{#                        <form action="{{ url_for('teacher.test') }}" method="post">#}
+                    <table class="table table-striped">
+{#	                    <caption>条纹表格布局</caption>#}
+                        <thead>
+		                    <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+			                    <th>权限</th>
+		                    </tr>
+	                    </thead>
+                        <tbody>
+                        {% for student in students %}
+		                    <tr>
+			                    <td>{{ student.s_id }}</td>
+                                <td>{{ student.s_name }}</td>
+                                {% if student.flag %}
+			                        <td>√</td>
+                                {% else %}
+                                    <td>×</td>
+                                {% endif %}
+                                <td><input type="button" value="开放" class="btn btn-primary" data-toggle="modal" data-target="#{{ course.c_id }}{{ student.s_id }}open">
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}{{ student.s_id }}open" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    开放权限[开放后学生可拍摄照片上传]
+				                                </h4>
+			                                </div>
+                                            <form action="{{ url_for('teacher.open_getFace') }}" method="post">
+			                                <div class="modal-body">
+                                                学&nbsp&nbsp号:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sid" value="{{ student.s_id }}" readonly>
+                                                <br>
+                                                姓&nbsp&nbsp名:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sname" value="{{ student.s_name }}" readonly>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary">确认</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+                                <input type="button" value="关闭" class="btn btn-primary" data-toggle="modal" data-target="#{{ course.c_id }}{{ student.s_id }}close">
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}{{ student.s_id }}close" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    关闭权限[关闭后学生不可拍摄照片上传]
+				                                </h4>
+			                                </div>
+                                            <form action="{{ url_for('teacher.close_getFace') }}" method="post">
+			                                <div class="modal-body">
+                                                学&nbsp&nbsp号:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sid" value="{{ student.s_id }}" readonly><br>
+                                                姓&nbsp&nbsp名:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sname" value="{{ student.s_name }}" readonly>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary">确认</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+                                <input type="button" value="录入详情" class="btn btn-primary" data-toggle="modal" data-target="#{{ course.c_id }}{{ student.s_id }}face"></td>
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}{{ student.s_id }}face" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    学生照片录入详情
+				                                </h4>
+			                                </div>
+                                            <form action="{{ url_for('teacher.delete_face') }}" method="post">
+			                                <div class="modal-body">
+                                                学&nbsp&nbsp号:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sid" value="{{ student.s_id }}" readonly>
+                                                <br>
+                                                姓&nbsp&nbsp名:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sname" value="{{ student.s_name }}" readonly>
+			                                    <br>
+                                                照&nbsp&nbsp片:
+                                                <br>
+                                                <br>
+                                                <img src="../../static/data/data_faces_from_camera/{{ student.s_id }}/1.jpg" style="width:150px;height: 150px">
+                                                <img src="../../static/data/data_faces_from_camera/{{ student.s_id }}/2.jpg" style="width:150px;height: 150px">
+                                                <img src="../../static/data/data_faces_from_camera/{{ student.s_id }}/3.jpg" style="width:150px;height: 150px">
+                                                <img src="../../static/data/data_faces_from_camera/{{ student.s_id }}/4.jpg" style="width:150px;height: 150px">
+                                                <img src="../../static/data/data_faces_from_camera/{{ student.s_id }}/5.jpg" style="width:150px;height: 150px">
+                                            </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                                <button type="submit" class="btn btn-primary">驳回重录</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+		                    </tr>
+                        {% endfor %}
+	                    </tbody>
+                    </table>
+                    {% endif %}
+{#                        </form>#}
+                </div>
+            </div>
+	    </div>
+
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
+
+</main>
+
+</body>
+</html>

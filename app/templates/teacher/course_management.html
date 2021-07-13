@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+    <style>
+        input{ border:0; }
+    </style>
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">课程信息</a>
+	</div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li><a data-toggle="modal" data-target="#new">新建课程</a></li>
+            <li><a data-toggle="modal" data-target="#add_sc" id="a">导入选课记录</a></li>
+        </ul>
+        <div class="modal fade" id="new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            开设新课
+                        </h4>
+                    </div>
+                    <form action="{{ url_for('teacher.new_course') }}" method="post">
+                        <div class="modal-body">
+                            课程名称:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="dd" name="cname" >
+                            <br>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+{#        导入选课记录#}
+        <div class="modal fade" id="add_sc" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            导入选课记录
+                        </h4>
+                    </div>
+                    <form action="{{ url_for('teacher.upload_sc') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body" style="align-content: left">
+                            下载：<a href="../../static/Files/scmuban.xlsx" download="学生选课记录导入模板.xlsx">学生选课记录导入模板</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            上传：<input type="file" style="display: inline" name="sc_file" >
+                            <br>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                        <div class="form-group" >
+                                    {% for message in get_flashed_messages() %}
+                                        {% if message=='success' %}
+                                        <div class="flash alert alert-success" role="alert" id="dlktsxx">导入成功</div>
+                                        {% else %}
+                                       <div class="flash alert alert-danger" role="alert" id="dlktsxx">{{ message }}</div>
+                                        {% endif %}
+                                    {% endfor %}
+								</div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+
+
+    </div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('teacher.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+
+</header>
+<main>
+    <div class="container-fluid">
+{% if dict %}
+    <div class="panel-group table" id="accordion">
+    {% for course,students in dict.items() %}
+        {# 一个课程#}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title" style="display: inline">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#{{ course.c_id }}">
+                        [{{ course.c_id }}] &nbsp&nbsp {{ course.c_name }}({{ course.flag }})
+                    </a>
+                </h4>
+                <input type="button" style="float: right" value="关闭" class="btn" data-toggle="modal" data-target="#{{ course.c_id }}close">
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}close" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    关闭选课
+				                                </h4>
+                                                <h5>[关闭后，学生将不能再选这门课]</h5>
+			                                </div>
+                                            <form action="{{ url_for('teacher.close_course') }}" method="post">
+			                                <div class="modal-body">
+				                                课程代码:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_id" value="{{ course.c_id }}" readonly>
+                                                课程名称:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_name" value="{{ course.c_name }}" readonly>
+                                                <br>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary">确认</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+                <input type="button" style="float: right" value="开放" class="btn" data-toggle="modal" data-target="#{{ course.c_id }}open">
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}open" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    开放选课
+				                                </h4>
+                                                <h5>[开放后，学生可自主选课]</h5>
+			                                </div>
+                                            <form action="{{ url_for('teacher.open_course') }}" method="post">
+			                                <div class="modal-body">
+				                                课程代码:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_id" value="{{ course.c_id }}" readonly>
+                                                课程名称:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_name" value="{{ course.c_name }}" readonly>
+                                                <br>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary">确认</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+
+
+            </div>
+            <div id="{{ course.c_id }}" class="panel-collapse collapse collapse">
+                <div class="panel-body">
+                    {% if students %}
+                    <table class="table table-striped">
+{#	                    <caption>条纹表格布局</caption>#}
+                        <thead>
+		                    <tr>
+                                <th>学号</th>
+			                    <th>姓名</th>
+			                    <th></th>
+		                    </tr>
+	                    </thead>
+                        <tbody>
+                        {% for student in students %}
+		                    <tr>
+			                    <td>{{ student.s_id }}</td>
+			                    <td>{{ student.s_name }}</td>
+			                    <td></td>
+                             <td></td>
+                                <td><input type="button" value="退课" class="btn btn-primary" data-toggle="modal" data-target="#{{ course.c_id }}{{ student.s_id }}"></td>
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ course.c_id }}{{ student.s_id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    学生退课
+				                                </h4>
+			                                </div>
+                                            <form action="{{ url_for('teacher.course_management') }}" method="post">
+			                                <div class="modal-body">
+				                                课程代码:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_id" value="{{ course.c_id }}" readonly>
+                                                课程名称:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_name" value="{{ course.c_name }}" readonly>
+                                                学&nbsp&nbsp号:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sid" value="{{ student.s_id }}" readonly>
+                                                姓&nbsp&nbsp名:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sname" value="{{ student.s_name }}" readonly>
+                                                <br>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary">确认</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+		                    </tr>
+                        {% endfor %}
+	                    </tbody>
+                    </table>
+                    {% endif %}
+                </div>
+            </div>
+	    </div>
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
+</main>
+</body>
+<script>
+    var a = $("#dlktsxx").text();
+    if(a!=''){
+        document.getElementById('a').click()
+    }
+</script>
+
+
+</html>

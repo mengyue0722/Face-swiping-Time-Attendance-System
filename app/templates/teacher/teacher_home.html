@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>刷脸签到系统</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="../../static/css/style1.css" rel="stylesheet" />
+    <script type="text/javascript" src="../../static/js/echarts.min.js"></script>
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .logout{float: right}
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="#">教师端</a>
+	</div>
+	<div>
+		<ul class="nav navbar-nav">
+            <li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					课程管理
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="{{ url_for('teacher.course_management') }}">课程信息</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{{ url_for('teacher.all_course') }}">课程签到</a></li>
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					学生管理
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="{{ url_for('teacher.select_all_records') }}">考勤记录</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{{ url_for('teacher.select_sc') }}">拍照权限设置</a></li>
+				</ul>
+			</li>
+            {% if flag=='0' %}
+            <li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					账号管理
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="{{ url_for('teacher.select_all_teacher') }}">教师</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{{ url_for('teacher.select_all_student') }}">学生</a></li>
+				</ul>
+			</li>
+            {% endif %}
+		</ul>
+	</div>
+        <div class="logout">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('logout') }}">退出</a></li>
+        </ul>
+        </div>
+        <div class="logout">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('teacher.update_password') }}">修改密码</a></li>
+        </ul>
+        </div>
+	</div>
+{% for message in get_flashed_messages() %}
+    <div  align="center" class="flash" id="message" role="alert">{{ message }}</div>
+{% endfor %}
+</nav>
+
+<div class="mainindex" style="margin-left: 5%;width: 90%;float: left;background-color: ghostwhite">
+
+
+        <div class="welinfo" style="width: 100%;float: left">
+            <span><img src="../../static/images/sun.png" alt="天气" /></span>
+            <b>{{ name }}，欢迎使用刷脸签到系统</b>
+        </div>
+
+        <div class="welinfo" style="width: 100%;float: left">
+            <span><img src="../../static/images/time.png" alt="时间" /></span>
+            <i>您上次登录的时间：{{ before }}</i> （不是您登录的？<a href="{{ url_for('teacher.update_password') }}">请点这里</a>）
+        </div>
+
+        <div class="xline" style="width: 100%;float: left"></div>
+        <div class="welinfo" style="width: 100%;float: left">
+        <span><img src="../../static/images/d03.png" alt="提醒" /></span>
+        <b>&nbsp&nbsp您的课程</b>
+        </div>
+        <div style="width: 100%;float: left">
+
+            <div class="welinfo" style="width: 25%;float:left;">
+                <ul class="infolist">
+                {% if courses %}
+                {% for c,n in courses.items() %}
+                    <li><span>[{{ c.c_id }}]{{ c.c_name }} ({{ c.flag }})</span></li>
+                {% endfor %}
+                {% else %}
+                <li><span>目前没有授课，您可以新建课程。</span></li>
+                {% endif %}
+                    <li><a class="ibtn" href="{{ url_for('teacher.course_management') }}">管理</a></li>
+                </ul>
+
+            </div>
+
+            {% if courses %}
+            <div style="width:75%;float: left;height: 300px" id="container"  >
+{#                <p>#}
+{#                 <canvas id="container" width="290" height="200"> </canvas>#}
+{#                </p>#}
+            </div>
+        {% endif %}
+
+        </div>
+
+
+    <div class="xline" style="width: 100%;float: left"></div>
+    <div class="box" style="width: 100%;float: left"></div>
+
+    <div class="welinfo" style="width: 100%;float: left">
+    <span><img src="../../static/images/dp.png" alt="提醒" /></span>
+    <b>刷脸签到系统使用指南</b>
+    </div>
+
+    <ul class="infolist" style="width: 100%;float: left">
+        <li><span>您可以开启实时签到操作</span><a class="ibtn" href="{{ url_for('teacher.all_course') }}">签到</a></li>
+        <li><span>您可以设置学生的拍照权限</span><a class="ibtn" href="{{ url_for('teacher.select_sc') }}">设置</a></li>
+        <li><span>您可以查看或修改所授课程下的考勤记录</span><a class="ibtn" href="{{ url_for('teacher.select_all_records') }}">查询考勤</a></li>
+        <li><span>您可以进行密码修改</span><a class="ibtn" href="{{ url_for('teacher.update_password') }}">修改密码</a></li>
+    {% if flag=='0' %}
+        <li><span>您可以对所有账户进行管理</span>
+			<a class="ibtn" href="{{ url_for('teacher.select_all_teacher') }}">教师账户</a>
+            <a class="ibtn" href="{{ url_for('teacher.select_all_student') }}">学生账户</a>
+        </li>
+    {% endif %}
+    </ul>
+
+    <div class="xline" style="width: 100%;float: left"></div>
+
+
+
+    </div>
+
+
+<script>$(".flash").fadeOut(2000);</script>
+<script type="text/javascript">
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+
+var option;
+
+option = {
+    title: {
+        {#text: '本月签到统计',#}
+        subtext: '学生统计/人',
+        left: 'center'
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'right'
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                {% for c,n in courses.items() %}
+                {value: {{ n }}, name: '{{c.c_name}}'},
+                {% endfor %}
+            ],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ]
+};
+
+option && myChart.setOption(option);
+
+</script>
+
+
+</body>
+
+</html>

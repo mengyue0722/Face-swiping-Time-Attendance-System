@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                考勤记录查询
+            </a>
+        </div>
+        <div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('student.home') }}">返回首页</a></li>
+            </ul>
+        </div>
+</header>
+<main div="col-xs-12">
+    <form action="{{ url_for('student.my_records') }}" method="post">
+        课程名称：
+        {% if courses %}
+        <select class="dd" name="course_id">
+            <option></option>
+        {% for course in courses %}
+            <option value="{{ course.c_id }}">{{ course.c_name }}</option>
+        {% endfor %}
+        </select>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        时间：
+        <input type="date" class="dd" name="time">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" class="btn btn-primary" value="查询">
+        {% endif %}
+    </form>
+<br><br>
+<div class="container-fluid">
+{% if dict %}
+    <div class="panel-group table" id="accordion">
+    {% for course,records in dict.items() %}
+        {# 一个课程#}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#{{ course.c_id }}">
+                        [{{ course.c_id }}] &nbsp&nbsp {{ course.c_name }}
+                    </a>
+                </h4>
+            </div>
+            <div id="{{ course.c_id }}" class="panel-collapse collapse collapse">
+                <div class="panel-body">
+                    {% if records %}
+                    <table class="table table-striped">
+{#	                    <caption>条纹表格布局</caption>#}
+                        <thead>
+		                    <tr>
+                                <th>学号</th>
+			                    <th>时间</th>
+			                    <th>考勤</th>
+		                    </tr>
+	                    </thead>
+                        <tbody>
+                        {% for record in records %}
+		                    <tr>
+			                    <td>{{ record.s_id }}</td>
+			                    <td>{{ record.time }}</td>
+			                    <td>{{ record.result }}</td>
+		                    </tr>
+                        {% endfor %}
+	                    </tbody>
+                    </table>
+                    {% endif %}
+                </div>
+            </div>
+	    </div>
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
+</main>
+</body>
+</html>

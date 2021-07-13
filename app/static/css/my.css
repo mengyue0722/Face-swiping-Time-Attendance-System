@@ -1,0 +1,61 @@
+.rr{
+            float: right;}
+        .dd{
+            width: 20%;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px #b0cbe0;
+            box-shadow: inset 0 1px 1px #b0cbe0;
+            -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+        .dd:focus {
+            outline:none;
+            border: 1px solid #78b4f7;
+}
+        form{
+            text-align: center;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .table{
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .table-input{
+            border: none;
+            overflow: hidden;;
+            background-color:rgba(0,0,0,0);
+        }
+        .table-input:focus{
+            outline:none;
+            border: none;
+        }
+
+        .yqd{
+            background: green;
+            border: none;
+        }
+        .qq{
+            background: red;
+            border: none;
+        }
+        .qj{
+            background: rebeccapurple;
+            border: none;
+        }
+        .cd{
+            background: sandybrown;
+            border: none;
+        }

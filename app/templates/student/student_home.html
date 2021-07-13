@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>学生签到系统</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="../../static/css/style1.css" rel="stylesheet" />
+    <script type="text/javascript" src="../../static/js/echarts.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+    /** 文档加载完成后立即执行的方法 */
+    // var weeks = new Array();
+
+    $(function(){
+    	var msg = "{{ msg }}"
+        if (msg == "success")
+            alert("已提交！")
+	})
+    </script>
+    <style>
+        .logout{float: right}
+        .students{
+            width: 40%;
+        }
+    </style>
+
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="#">学生端</a>
+	</div>
+	<div>
+		<ul class="nav navbar-nav">
+            {% if flag %}
+			<li><a href="{{ url_for('student.get_faces') }}">人脸录入</a></li>
+            {% endif %}
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+					学生中心
+					<b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+{#					<li class="divider"></li>#}
+					<li><a href="{{ url_for('student.choose_course') }}">选课</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{{ url_for('student.unchoose_course') }}">退课</a></li>
+                    <li class="divider"></li>
+					<li><a href="{{ url_for('student.my_records') }}">考勤记录</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+    <div class="logout">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('logout') }}">退出</a></li>
+        </ul>
+    </div>
+        <div class="logout">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('student.update_password') }}">修改密码</a></li>
+        </ul>
+        </div>
+
+	</div>
+
+{% for message in get_flashed_messages() %}
+    <div  align="center" class="flash" id="message" role="alert">{{ message }}</div>
+{% endfor %}
+
+</nav>
+
+
+    <div class="mainindex" style="margin-left: 5%;width: 90%;float: left;background-color: ghostwhite">
+
+
+        <div class="welinfo" style="width: 100%;float: left">
+            <span><img src="../../static/images/sun.png" alt="天气" /></span>
+            <b>{{ name }}，欢迎使用刷脸签到系统</b>
+        </div>
+
+        <div class="welinfo" style="width: 100%;float: left">
+            <span><img src="../../static/images/time.png" alt="时间" /></span>
+            <i>您上次登录的时间：{{ before }}</i> （不是您登录的？<a href="{{ url_for('student.update_password') }}">请点这里</a>）
+        </div>
+
+        <div class="xline" style="width: 100%;float: left"></div>
+        <div class="welinfo" style="width: 100%;float: left">
+        <span><img src="../../static/images/t02.png" alt="提醒" /></span>
+        <b>&nbsp&nbsp最近的签到记录</b>
+        </div>
+        <div style="width: 100%;float: left">
+
+            <div class="welinfo" style="width: 40%;float:left;">
+                <ul class="infolist">
+                {% if records %}
+                {% for a,c in records.items() %}
+                    <li><span>"{{ c[0].c_name }}"   {{ a.time }}考勤中{{ a.result }}</span></li>
+                {% endfor %}
+                    <li><a  href="{{ url_for('student.my_records') }}">更多...</a></li>
+                {% else %}
+                <li><span>目前没有考勤记录。</span></li>
+                {% endif %}
+                </ul>
+        
+            </div>
+    
+           {% if num['qq'] or num['qj'] or num['yqd'] or num['cd']%}
+            <div style="width:50%;float: left;height: 200px" id="container"  >
+{#                <p>#}
+{#                 <canvas id="container" width="290" height="200"> </canvas>#}
+{#                </p>#}
+            </div>
+           {% endif %}
+
+        </div>
+
+
+    <div class="xline" style="width: 100%;float: left"></div>
+    <div class="box" style="width: 100%;float: left"></div>
+
+    <div class="welinfo" style="width: 100%;float: left">
+    <span><img src="../../static/images/dp.png" alt="提醒" /></span>
+    <b>刷脸签到系统使用指南</b>
+    </div>
+
+    <ul class="infolist" style="width: 100%;float: left">
+    <li><span>您可以进行选/退课操作</span><a class="ibtn" href="{{ url_for('student.choose_course') }}">选课</a><a class="ibtn" href="{{ url_for('student.unchoose_course') }}">退课</a></li>
+    <li><span>您可以查看考勤记录</span><a class="ibtn" href="{{ url_for('student.my_records') }}">查询考勤</a></li>
+    <li><span>您可以进行密码修改</span><a class="ibtn" href="{{ url_for('student.update_password') }}">修改密码</a></li>
+    <li><span>您可以在有权限的情况下录入人脸图像</span>
+        {% if flag %}
+			<a class="ibtn" href="{{ url_for('student.get_faces') }}">人脸录入</a>
+        {% endif %}
+        <a class="ibtn">暂无权限</a>
+    </li>
+    </ul>
+
+    <div class="xline" style="width: 100%;float: left"></div>
+
+
+
+    </div>
+{#<div style="width: 35%;float: left">#}
+{#    <img src="data:image/png;base64, {{ plot }}">#}
+{##}
+{#</div>#}
+<script>$(".flash").fadeOut(2000);</script>
+
+<script type="text/javascript">
+			var dom = document.getElementById("container");
+			var myChart = echarts.init(dom);
+
+var option;
+
+option = {
+    title: {
+        {#text: '近一个月签到统计',#}
+        subtext: '本月签到/次',
+        left: 'center'
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'right'
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                {value: {{ num['qj'] }}, name: '请假'},
+                {value: {{ num['yqd'] }}, name: '已签到'},
+                {value: {{ num['cd'] }}, name: '迟到'},
+                {value: {{ num['qq'] }}, name: '缺勤'}
+            ],
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ]
+};
+
+option && myChart.setOption(option);
+
+</script>
+</body>
+</html>

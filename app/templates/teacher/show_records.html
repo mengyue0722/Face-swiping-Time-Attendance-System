@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>刷脸签到系统</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../../static/css/my.css">
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+    <div class="navbar-header">
+		<a class="navbar-brand" href="#">考勤记录查询</a>
+	</div>
+	<div class="rr">
+            <ul class="nav navbar-nav">
+                <li><a  href="{{ url_for('teacher.home') }}">返回首页</a></li>
+            </ul>
+    </div>
+</header>
+<main>
+<form action="{{ url_for('teacher.select_all_records') }}" method="post">
+        课程名称：
+        {% if courses %}
+        <select class="dd" name="course_id">
+            <option></option>
+        {% for course in courses %}
+            <option value="{{ course.c_id }}">{{ course.c_name }}</option>
+        {% endfor %}
+        </select>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        时间：
+        <input type="date" class="dd" name="time">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        学号：
+        <input type="text" class="dd" name="sid">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" class="btn btn-primary" value="查询">
+        {% endif %}
+    </form>
+<br>
+<br>
+    <div align="center">
+        筛选:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button onclick="yqd()" class="btn btn-primary yqd">已签到</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button onclick="cd()" class="btn btn-primary cd">迟到</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button onclick="qj()" class="btn btn-primary qj">请假</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button onclick="qq()" class="btn btn-primary qq" >缺勤</button>
+    </div>
+<br><br>
+
+
+<div class="container-fluid">
+{% if dict %}
+    <div class="panel-group table" id="accordion">
+    {% for course,one_course_all_time_records in dict.items() %}
+        {# 一个课程#}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#{{ course.c_id }}">
+                        [{{ course.c_id }}] &nbsp&nbsp {{ course.c_name }}
+                    </a>
+                </h4>
+            </div>
+            <div id="{{ course.c_id }}" class="panel-collapse collapse collapse">
+                <div class="panel-body">
+
+{#                        一个时间段#}
+                    <div class="container-fluid">
+{% if one_course_all_time_records %}
+    <div class="panel-group" id="accordion0">
+    {% for time,records in one_course_all_time_records.items() %}
+        {# 一个课程#}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title" style="display: inline">
+                    <a data-toggle="collapse" data-parent="#accordion0" href="#{{ time.id}}">
+                        [{{ time.time }}] &nbsp&nbsp {{ time.time }}
+                    </a>
+                </h4>
+                <form action="{{ url_for('teacher.download') }}" method="post" id="test{{ time.id }}">
+                    <input type="text" name="cid" value="{{ course.c_id }}" hidden>
+                    <input type="text" name="cname" value="{{ course.c_name }}" hidden>
+                    <input type="text" name="time" value="{{ time.time }}" hidden>
+                    <input type="submit" style="float: right" value="导出" >
+
+                </form>
+
+            </div>
+            <div id="{{ time.id }}" class="panel-collapse collapse collapse">
+                <div class="panel-body">
+                    {% if records %}
+{#                        <form action="{{ url_for('teacher.test') }}" method="post">#}
+                    <table class="table table-striped">
+{#	                    <caption>条纹表格布局</caption>#}
+                        <thead>
+		                    <tr>
+                                <th>学号</th>
+			                    <th>考勤</th>
+		                    </tr>
+	                    </thead>
+                        <tbody>
+                        {% for record in records %}
+		                    <tr id="{{ record.result }}">
+			                    <td>{{ record.s_id }}</td>
+			                    <td>{{ record.result}}</td>
+                                <td></td>
+                                <td><input type="button" value="修改" class="btn btn-primary" data-toggle="modal" data-target="#{{ time.id }}{{ record.s_id }}"></td>
+                                <!-- 模态框（Modal） -->
+                                <div class="modal fade" id="{{ time.id }}{{ record.s_id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                                <div class="modal-dialog">
+                                        <div class="modal-content">
+			                                <div class="modal-header">
+				                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                                &times;
+				                                </button>
+				                                <h4 class="modal-title" id="myModalLabel">
+                                                    修改考勤
+				                                </h4>
+			                                </div>
+                                            <form action="{{ url_for('teacher.update_attend') }}" method="post">
+			                                <div class="modal-body">
+				                                课程代码:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="course_id" value="{{ course.c_id }}" readonly>
+                                                学&nbsp&nbsp号:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="sid" value="{{ record.s_id }}" readonly>
+                                                <br>
+                                                考勤时间:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" class="table-input" name="time" value="{{ time.time }}" readonly>
+                                                考勤情况:&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<select class="dd" name="result">
+                                                            <option value="已签到">已签到</option>
+                                                            <option value="迟到">迟到</option>
+                                                            <option value="缺勤">缺勤</option>
+                                                            <option value="请假">请假</option>
+                                                        </select>
+			                                </div>
+			                                <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                                <button type="submit" class="btn btn-primary">提交更改</button>
+			                                </div>
+                                            </form>
+		                                </div><!-- /.modal-content -->
+	                                </div><!-- /.modal -->
+                                </div>
+		                    </tr>
+                        {% endfor %}
+	                    </tbody>
+                    </table>
+                    {% endif %}
+{#                        </form>#}
+                </div>
+            </div>
+	    </div>
+    {% endfor %}
+    </div>
+{% endif %}
+
+
+                </div>
+            </div>
+	    </div>
+    {% endfor %}
+    </div>
+{% endif %}
+</div>
+</div>
+
+</main>
+<script>
+    function qq() {
+        $("#已签到").hide();
+        $("#迟到").hide();
+        $("#请假").hide();
+        $("#缺勤").show();
+    }
+    function yqd() {
+        $("#缺勤").hide();
+        $("#迟到").hide();
+        $("#请假").hide();
+        $("#已签到").show();
+    }
+    function qj() {
+        $("#已签到").hide();
+        $("#迟到").hide();
+        $("#缺勤").hide();
+        $("#请假").show();
+    }
+    function cd() {
+        $("#已签到").hide();
+        $("#缺勤").hide();
+        $("#请假").hide();
+        $("#迟到").show();
+    }
+</script>
+</body>
+<script>
+{#function download() {#}
+{#window.open('/teacher/download?cid={{ course.c_id }}&cname={{ course.c_name }}&time={{ time.time }}');#}
+{#}#}
+</script>
+</html>
