@@ -6,7 +6,11 @@
 >工具库 Dlib OpenCV  
 >框架 Flask Bootstrap  
 >数据库 MySQL  
-   
+
+## 数据集
+>CASIA-FaceV5  
+>500人*5张/人  
+ 
 ## 代码介绍  
 >功能代码在app文件夹下  
 >static文件夹 存放静态资源  
